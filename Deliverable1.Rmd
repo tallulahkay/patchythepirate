@@ -5,6 +5,14 @@ output: github_document
 
 ## HELLO
 
+```{r}
+library(tidyverse)
+
+suicide <- read_csv("master.csv", col_names = TRUE, na = "")
+
+```
+
+
 ## Abstract
 
 ## Data Description
