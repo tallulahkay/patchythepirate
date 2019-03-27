@@ -1,6 +1,18 @@
 ---
-title: "Deliverable 1"
+title: "Data Description and EDA"
 output: github_document
 ---
 
-## Deliverable 1
+## Abstract
+
+## Data Description
+
+## Research Question
+
+## Data Import & Cleaning
+
+## Variation of Single Variables
+
+## Covariation between Multiple Variables
+
+## Discussion
