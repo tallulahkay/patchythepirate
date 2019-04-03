@@ -27,6 +27,7 @@ suicide <- merge(suicide, mobile, type = "left", match = "all")
 suicide <- merge(suicide, unemployment, type = "left", match = "all")
 suicide <- merge(suicide, rural, type = "left", match = "all")
 suicide
+
 #suicide %>% group_by(year) %>% ggplot(aes(country, 'gdp_per_capita ($)')) + geom_point()
 
 
