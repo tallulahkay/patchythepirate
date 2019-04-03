@@ -53,7 +53,7 @@ What is the effect of different country factors, such as population and gdp, and
 Data Import & Cleaning
 ----------------------
 
-Data import of the main 'suicide' dataset was succesful, with only the 'HDI/year' having a number of missing values for each country and year.
+Data import of the main 'suicide' dataset was succesful, with only the 'HDI/year' having a number of missing values for each country and year. The reamining variables, including the unemployment rate, country's rural population, and the amount of mobile service subscriptions, had to be input separately from several World Bank datasets. These databases had several missing values that had to be assigned as missing and then joined with the master dataset by country name and year.
 
 Variation of Single Variables
 -----------------------------
