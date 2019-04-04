@@ -5,6 +5,15 @@ output: github_document
 
 ## HELLO
 
+## Abstract
+
+## Data Description
+
+## Research Question
+What is the effect of different country factors, such as population and gdp, and age of individuals on suicide rate within the past three decades.
+
+## Data Import & Cleaning
+aes(reorder(Prod_Category_ID, Purchase, FUN = median
 ```{r}
 library(tidyverse)
 
@@ -16,35 +25,42 @@ rural <- read_csv("rural_pop.csv", col_names = TRUE, na = "")
 
 mobile <- mobile %>% gather("2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", key = "year", value = "mobile_per100")
 
-unemploy <- unemployment %>% gather("2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", key = "year", value = "unemployment")
+unemploy <- unemploy %>% gather("2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", key = "year", value = "unemployment")
 
 rural <- rural %>% gather("2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", key = "year", value = "rural_pct")
+
+
+yc <- suicide %>% count(`country-year`, wt = suicides_no)  
+colnames(yc)[2] <- "total_suicide"
+
+yc_2 <- suicide %>% count(`country-year`, wt = population)
+colnames(yc_2)[2] <- "total_population"
+
+suicide_yc <- left_join(yc, yc_2)
+suicide_yc
+
+#suicide_yc2 <- suicide %>% group_by(`country-year`) %>% mutate(gdp_per_capita = mean(`gdp_per_capita ($)`)) %>% summarize(gdp_per_capita)
+
+suicide = left_join(suicide, suicide_yc)
+suicide
+
 
 suicide <- merge(suicide, mobile, type = "left", match = "all")
 suicide <- merge(suicide, unemploy, type = "left", match = "all")
 suicide <- merge(suicide, rural, type = "left", match = "all")
 
-#suicide %>% group_by(year) %>% ggplot(aes(country, 'gdp_per_capita ($)')) + geom_point()
-
 
 ```
 
 
-## Abstract
-
-## Data Description
-
-## Research Question
-What is the effect of different country factors, such as population and gdp, and age of individuals on suicide rate within the past three decades.
-
-## Data Import & Cleaning
-
 ## Variation of Single Variables
 
 ```{r}
-suicide %>% group_by(age) %>% ggplot(aes(age, `suicides/100k pop`)) + geom_point()
+suicide %>% group_by(age) %>% ggplot(aes(age, log(`suicides/100k pop`))) + geom_point() + geom_boxplot()
 
-suicide %>% group_by(country, year) %>% ggplot(aes(`suicides/100k pop`, unemployment))
+suicide %>% group_by(country, year) %>% ggplot(aes(sex, log(`suicides/100k pop`))) + geom_boxplot()
+
+
 
 ```
 
