@@ -13,7 +13,6 @@ output: github_document
 What is the effect of different country factors, such as population and gdp, and age of individuals on suicide rate within the past three decades.
 
 ## Data Import & Cleaning
-aes(reorder(Prod_Category_ID, Purchase, FUN = median
 ```{r}
 library(tidyverse)
 
@@ -36,19 +35,16 @@ colnames(yc)[2] <- "total_suicide"
 yc_2 <- suicide %>% count(`country-year`, wt = population)
 colnames(yc_2)[2] <- "total_population"
 
-suicide_yc <- left_join(yc, yc_2)
-suicide_yc
+suicide_cy <- left_join(yc, yc_2)
 
-#suicide_yc2 <- suicide %>% group_by(`country-year`) %>% mutate(gdp_per_capita = mean(`gdp_per_capita ($)`)) %>% summarize(gdp_per_capita)
-
-suicide = left_join(suicide, suicide_yc)
-suicide
-
+suicide <- left_join(suicide, suicide_cy)
+suicide <- suicide %>% mutate('total_suicides/100k pop' = total_suicide / total_population * 100000)
 
 suicide <- merge(suicide, mobile, type = "left", match = "all")
 suicide <- merge(suicide, unemploy, type = "left", match = "all")
 suicide <- merge(suicide, rural, type = "left", match = "all")
 
+suicide_yc <- suicide %>% group_by(`country-year`) %>% summarize(`gdp_per_capita ($)` = mean(`gdp_per_capita ($)`), total_suicide = mean(total_suicide), total_population = mean(total_population), `total_suicides/100k pop` = mean(`total_suicides/100k pop`), mobile_per100 = mean(mobile_per100), unemployment = mean(unemployment), rural_pct = mean(rural_pct))
 
 ```
 
