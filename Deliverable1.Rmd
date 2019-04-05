@@ -16,13 +16,15 @@ What is the effect of different country factors, such as population and gdp, and
 ```{r}
 library(tidyverse)
 
-suicide <- read_csv("master.csv", col_names = TRUE, na = "") %>% filter(year >= 2006) %>% select(country, year, sex, age, suicides_no, population, 'suicides/100k pop', 'country-year', 'gdp_per_capita ($)', generation)
+suicide <- read_csv("master.csv", col_names = TRUE, na = "") %>% filter(year >= 2006, country == c("United States", "Canada", "Mexico", "Belize", "Costa Rica", "El Salvador", "Guatemala", "Honduras", "Nicaragua", "Panama")) %>% select(country, year, sex, age, suicides_no, population, 'suicides/100k pop', 'country-year', 'gdp_per_capita ($)', generation) 
 
 mobile <- read_csv("mobile.csv", col_names = TRUE, na = "")
 unemploy <- read_csv("unemployment.csv", col_names = TRUE, na="")
 rural <- read_csv("rural_pop.csv", col_names = TRUE, na = "")
 
 mobile <- mobile %>% gather("2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", key = "year", value = "mobile_per100") %>% unite(`country-year`, country, year, sep = "")
+
+mobile
 
 unemploy <- unemploy %>% gather("2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", key = "year", value = "unemployment") %>% unite(`country-year`, country, year, sep = "")
 
@@ -40,11 +42,9 @@ suicide_cy <- left_join(yc, yc_2)
 suicide <- left_join(suicide, suicide_cy)
 suicide <- suicide %>% mutate('total_suicides/100k pop' = total_suicide / total_population * 100000)
 
-suicide
-
-suicide <- merge(suicide, mobile, by = `country-year`, all.x=TRUE)
-suicide <- merge(suicide, unemploy, by = `country-year`, all.x=TRUE)
-suicide <- merge(suicide, rural, by = `country-year`, all.x=TRUE)
+suicide <- merge(suicide, mobile, by = 'country-year', all.x=TRUE)
+suicide <- merge(suicide, unemploy, by = 'country-year', all.x=TRUE)
+suicide <- merge(suicide, rural, by = 'country-year', all.x=TRUE)
 
 suicide
 
@@ -52,7 +52,10 @@ suicide_yc <- suicide %>% group_by(`country-year`) %>% summarize(`gdp_per_capita
 
 suicide_yc <- suicide_yc %>% separate(`country-year`, into=c("country", "year"), sep=-4)
 
+suicide_yc$gdp_level <- cut(suicide_yc$`gdp_per_capita ($)`, breaks=c(0, 30000, Inf), labels=c("low", "high"))
+
 suicide_yc
+
 ```
 
 
@@ -70,10 +73,17 @@ suicide_yc %>% group_by(country, year) %>% ggplot(aes(unemployment, `total_suici
 suicide_yc %>% group_by(country, year) %>% ggplot(aes(rural_pct, `total_suicides/100k pop`)) + geom_point()
 
 suicide_yc %>% group_by(country, year) %>% ggplot(aes(mobile_per100, `total_suicides/100k pop`)) + geom_point()
+
+suicide_yc %>% group_by(country, year) %>% ggplot(aes(`gdp_per_capita ($)`, `total_suicides/100k pop`)) + geom_point()
 ```
 
 ## Covariation between Multiple Variables
 
+```{r}
+suicide_yc %>% ggplot(aes(unemployment, `gdp_per_capita ($)`)) + geom_hex()
+
+suicide_yc %>% ggplot(aes(mobile_per100, log(rural_pct))) + geom_hex()
+```
 
 
 
