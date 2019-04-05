@@ -3,11 +3,15 @@ title: "Data Description and EDA"
 output: github_document
 ---
 
-## HELLO
-
 ## Abstract
 
+Our project looks into the factors affecting suicide rates in North and Central America, from 2006 to 2016. 
+
 ## Data Description
+
+We found our primary dataset on Kaggle. It summarizes suicide rates for different demographics, age and sex, across all countries from the years 1987 to 2016. In deciding to look into suicide rates, we were drawn to look at socio-economic factors that influenced levels suicide rates and so found three secondary datasets, on the world bank website. We choose to look at unemployment levels, mobile phone usage and percentage of land considered rural. Given these variables, we decided to moderate the range of years in order to focus on moderate life and it's influence on suicide rates. 
+
+
 
 ## Research Question
 What is the effect of different country factors, such as population and gdp, and age of individuals on suicide rate within the past three decades.
@@ -17,6 +21,8 @@ What is the effect of different country factors, such as population and gdp, and
 library(tidyverse)
 
 suicide <- read_csv("master.csv", col_names = TRUE, na = "") %>% filter(year >= 2006, country == c("United States", "Canada", "Mexico", "Belize", "Costa Rica", "El Salvador", "Guatemala", "Honduras", "Nicaragua", "Panama")) %>% select(country, year, sex, age, suicides_no, population, 'suicides/100k pop', 'country-year', 'gdp_per_capita ($)', generation) 
+
+suicide
 
 mobile <- read_csv("mobile.csv", col_names = TRUE, na = "")
 unemploy <- read_csv("unemployment.csv", col_names = TRUE, na="")
@@ -58,15 +64,33 @@ suicide_yc
 
 ```
 
+Summary of Data Variables 
+- country - Belize, Canada, Costa Rica, El Salvador, Guatemala, Honduras, Mexico, Nicaragua, Panama, United States of America
+- year - 2006-2015 
+- sex - Male, Female
+- age - 5 -14 years, 15-24 years, 25-34 years, 35-54 years, 55-74 years, 75+ years
+- suicide_no - Number of suicides for each age and sex combination, for example number of males aged between 35 and 54 years who committed suicide in Belize in 2006 
+- population - Population of age and sex combination, for example number of males aged between 35 and 54 years old living in Belize in 2006. 
+- suicides/100k pop - Number of suicides for each sex and age combination, in a given country during a given year, per 100000 members of that sex and age combination. 
+- country-year - a variable combining the year and country of a row, for example "Belize2006"
+- gdp_per_capita ($) - Gross Domestic Product of a country in a given year. 
+- mobile_per100 - Mobile Cellular Subcriptions (per 100 people) for a country in a given year
+- unemployment - Unemployment (% of total Labor Force) for a country in a given year 
+- rural_pct - Rural Population(% of total population) for a country in a given year 
+- total_suicide - Total Suicides in a country for a given year (sum of suicides for different demographics)
+- total_population - Total Population, from demographics, in a country for a given year (sum of population for different demographics)
+- total_suicides/100k pop - Total suicides per 100k of the total population (total_suicides/total_population * 100000)
+
+
 
 ## Variation of Single Variables
 
 ```{r}
 suicide %>% group_by(age) %>% ggplot(aes(age, log(`suicides/100k pop`))) + geom_point() + geom_boxplot()
 
-suicide %>% group_by(country, year) %>% ggplot(aes(sex, log(`suicides/100k pop`))) + geom_boxplot()
+suicide %>% group_by(country, year) %>% ggplot(aes(sex, `suicides/100k pop`)) + geom_boxplot()
 
-suicide_yc %>% group_by(year) %>% ggplot(aes(year, `total_suicides/100k pop`)) + geom_point() + geom_boxplot()
+suicide_yc %>% group_by(year) %>% ggplot(aes(year, `total_suicides/100k pop`)) + geom_boxplot()
 
 suicide_yc %>% group_by(country, year) %>% ggplot(aes(unemployment, `total_suicides/100k pop`)) + geom_point()
 
@@ -75,14 +99,21 @@ suicide_yc %>% group_by(country, year) %>% ggplot(aes(rural_pct, `total_suicides
 suicide_yc %>% group_by(country, year) %>% ggplot(aes(mobile_per100, `total_suicides/100k pop`)) + geom_point()
 
 suicide_yc %>% group_by(country, year) %>% ggplot(aes(`gdp_per_capita ($)`, `total_suicides/100k pop`)) + geom_point()
+
+suicide_yc %>% group_by(country = factor(country)) %>% ggplot(aes(country, `total_suicides/100k pop`)) + geom_boxplot(aes(reorder(country, `total_suicides/100k pop`, FUN = median))) + labs(title = "Boxplots of Suicides per 100k population Across Countries", x = "County", y = "Suicides per 100k Population")
+
+suicide_yc %>% group_by(country) %>% ggplot(aes(year, mobile_per100, group = country, color = country)) + geom_line() + labs(title = "Mobile Phone Subcriptions per 100 people by Country, from 2006 to 2015", x = "Year", y = "Mobile Phone Subcriptions(per 100", color = "Country")
+
 ```
+
+
 
 ## Covariation between Multiple Variables
 
 ```{r}
-suicide_yc %>% ggplot(aes(unemployment, `gdp_per_capita ($)`)) + geom_hex()
+suicide_yc %>% ggplot(aes(unemployment, mobile_per100, shape = gdp_level, color = year)) + geom_point() + labs(title = "Mobile Phone Subcriptions against Unemployment, considering GDP level", x = "Unemployment(% of total labor force)", y = "Mobile Phone Subcriptions (per 100 people)")
 
-suicide_yc %>% ggplot(aes(mobile_per100, log(rural_pct))) + geom_hex()
+suicide_yc %>% ggplot(aes(mobile_per100, `gdp_per_capita ($)`)) + geom_hex()
 ```
 
 
