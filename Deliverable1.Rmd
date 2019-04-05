@@ -22,11 +22,11 @@ mobile <- read_csv("mobile.csv", col_names = TRUE, na = "")
 unemploy <- read_csv("unemployment.csv", col_names = TRUE, na="")
 rural <- read_csv("rural_pop.csv", col_names = TRUE, na = "")
 
-mobile <- mobile %>% gather("2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", key = "year", value = "mobile_per100") %>% unite(`country-year`, country, year, sep = "")
+mobile <- mobile %>% gather("2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", key = "year", value = "mobile_per100") %>% unite('country-year', "Country Name", "year", sep="")
 
-unemploy <- unemploy %>% gather("2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", key = "year", value = "unemployment") %>% unite(`country-year`, country, year, sep = "")
+unemploy <- unemploy %>% gather("2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", key = "year", value = "unemployment") %>% unite('country-year', "Country Name", "year", sep="")
 
-rural <- rural %>% gather("2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", key = "year", value = "rural_pct") %>% unite(`country-year`, country, year, sep = "")
+rural <- rural %>% gather("2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", key = "year", value = "rural_pct") %>% unite('country-year', "Country Name", "year", sep="")
 
 
 yc <- suicide %>% count(`country-year`, wt = suicides_no)  
@@ -42,11 +42,10 @@ suicide <- suicide %>% mutate('total_suicides/100k pop' = total_suicide / total_
 
 suicide
 
-suicide <- merge(suicide, mobile, by = `country-year`, all.x=TRUE)
-suicide <- merge(suicide, unemploy, by = `country-year`, all.x=TRUE)
-suicide <- merge(suicide, rural, by = `country-year`, all.x=TRUE)
+suicide <- merge(suicide, mobile, by = "country-year", all.x=TRUE)
+suicide <- merge(suicide, unemploy, by = "country-year", all.x=TRUE)
+suicide <- merge(suicide, rural, by = "country-year", all.x=TRUE)
 
-suicide
 
 suicide_yc <- suicide %>% group_by(`country-year`) %>% summarize(`gdp_per_capita ($)` = mean(`gdp_per_capita ($)`), total_suicide = mean(total_suicide), total_population = mean(total_population), `total_suicides/100k pop` = mean(`total_suicides/100k pop`), mobile_per100 = mean(mobile_per100), unemployment = mean(unemployment), rural_pct = mean(rural_pct))
 
@@ -74,6 +73,10 @@ suicide_yc %>% group_by(country, year) %>% ggplot(aes(mobile_per100, `total_suic
 
 ## Covariation between Multiple Variables
 
+```{r}
+
+
+```
 
 
 
